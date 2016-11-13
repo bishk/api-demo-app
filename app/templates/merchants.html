@@ -1,0 +1,12 @@
+{% if merchants|length == 0 %}
+		<tr><td>No merchants available.</td></tr>
+{% else %}
+
+	{% for merchant in merchants.data %}
+		<div class="row">
+			<div class="well well-sm merchant" id="{{ merchant._id }}">
+				<p class="name" style="font-size: 20px;">{{ merchant.name }}</p>
+			</div>
+		</div>
+	{% endfor %}
+{% endif %}

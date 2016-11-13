@@ -21,7 +21,7 @@ $(function(){
 	/* ========== Selecting To Account Button ========== */
 
 	$("#selectTransferToBtn").click(function() {
-		$(".account").filter(function() {
+		$(".merchant").filter(function() {
 				return !(isSelected($(this)));
 			}).css(selectingAccountsCss);
 
@@ -51,45 +51,14 @@ $(function(){
 
 	// set all accounts as not selected
 	$(".account").data(resetSelections);
+	$(".merchant").data(resetSelections);
 	
 	$(".account").click(function() {
-		var isToAccountSelected = $(this).data('selectedToAccount');
-		var isFromAccountSelected = $(this).data('selectedFromAccount')
-		var selected = isToAccountSelected || isFromAccountSelected;
 		
-		if (selectingToAccount) {
-			// store the id of this account
-			idOfSelectedToAccount = $(this).attr('id')
-
-			// update the UI to show which account was selected
-			$("#transferToAccount").text($(this).find(".nickname").text());
-
-			// reset all borders on accounts
-			$(".account").filter(function() {
-				return !(isFromSelected($(this)));
-			}).css(emptyBorder);
-
-			// clear any other To Account selections that have been made
-			resetToData();
-
-			// mark this account as selected
-			$(this).data('selectedToAccount', true);
-			$("#toAccount").val(idOfSelectedToAccount);
-
-			// if the From Account is selected, overwrite it
-			if ($(this).data('selectedFromAccount') == true) {
-				$(this).data('selectedFromAccount', false);
-				idOfSelectedFromAccount = undefined;
-				$("#transferFromAccount").text("");
-				$("#fromAccount").val("");
-			}
-			
-			// add a border to the selected account to show it's selected
-			$('#' + idOfSelectedToAccount).css(selectedToAccountCss);
-
-			// no longer selecting a To Account
-			selectingToAccount = false;
-		} else if (selectingFromAccount) {
+		var isFromAccountSelected = $(this).data('selectedFromAccount')
+		var selected = isFromAccountSelected;
+		
+		if (selectingFromAccount) {
 			// store the id of this account
 			idOfSelectedFromAccount = $(this).attr('id')
 
@@ -133,6 +102,55 @@ $(function(){
 		}
 	});
 
+	$(".merchant").click(function() {
+		var isToAccountSelected = $(this).data('selectedToAccount');
+		
+		var selected = isToAccountSelected;
+		if (selectingToAccount) {
+			// store the id of this account
+			idOfSelectedToAccount = $(this).attr('id')
+
+			// update the UI to show which account was selected
+			$("#transferToAccount").text($(this).find(".name").text());
+
+			// reset all borders on accounts
+			$(".merchant").filter(function() {
+				return !(isFromSelected($(this)));
+			}).css(emptyBorder);
+
+			// clear any other To Account selections that have been made
+			resetToData();
+
+			// mark this account as selected
+			$(this).data('selectedToAccount', true);
+			$("#toAccount").val(idOfSelectedToAccount);
+
+			// if the From Account is selected, overwrite it
+			if ($(this).data('selectedFromAccount') == true) {
+				$(this).data('selectedFromAccount', false);
+				idOfSelectedFromAccount = undefined;
+				$("#transferFromAccount").text("");
+				$("#fromAccount").val("");
+			}
+			
+			// add a border to the selected account to show it's selected
+			$('#' + idOfSelectedToAccount).css(selectedToAccountCss);
+
+			// no longer selecting a To Account
+			selectingToAccount = false;
+		} 
+		    else if (selected) {
+			if (isToAccountSelected) {
+				$("#transferToAccount").text("");
+			} else if (isFromAccountSelected) {
+				$("#transferFromAccount").text("");
+			}
+
+			$(this).data(resetSelections)
+			$(this).css(emptyBorder);
+		}
+	});
+
 
 	/* ========== Helper Methods ========== */
 
@@ -149,13 +167,13 @@ $(function(){
 	}
 
 	var resetToData = function() {
-		$(".account").filter(function() {
+		$(".merchant").filter(function() {
 			return $(this).data("selectedToAccount") == true
 		}).data("selectedToAccount", false);
 	}
 
 	var resetFromData = function() {
-		$(".account").filter(function() {
+		$(".merchant").filter(function() {
 			return $(this).data("selectedFromAccount") == true
 		}).data("selectedFromAccount", false);
 	}

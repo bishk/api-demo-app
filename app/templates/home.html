@@ -17,28 +17,30 @@
 			
 			<!-- Column Titles Row -->
 			<div class="row">
-				<div class="col-md-1">&nbsp;</div>
 				<div class="col-md-3">
-					<h3>My Accounts</h3>
+					<h3>My Accounts </h3>
 					<br>
 				</div>
-				<div class="col-md-1">&nbsp;</div>
 				<div class="col-md-6">
-					<h3>Transfer Money</h3>
+					<h3>Pay Merchant</h3>
+					<br>
+				</div>
+				<div class="col-md-3">
+					<h3>Merchants</h3>
 					<br>
 				</div>
 			</div>
 
 			<!-- Column Content Row -->
 			<div class="row">
-				<div class="col-md-1">&nbsp;</div>
+				
 		
 				<!-- Accounts List Column -->
 				<div class="col-md-3">
 					{% include 'accounts.html' %}
 		    	</div>
 			
-				<div class="col-md-1">&nbsp;</div>
+				
 
 				<!-- Money Transfer Column -->
 				<div class="col-md-6">
@@ -50,6 +52,10 @@
 
 					{% include 'transferList.html' %}
 				</div>
+				<div class="col-md-3">
+					{% include 'merchants.html' %}
+		    	</div>
+
 			</div>
     	</div>
 	</body>

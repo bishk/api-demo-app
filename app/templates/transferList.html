@@ -6,15 +6,15 @@
 		<th>Status</th>
 	</tr>
 
-	{% if transfers|length == 0 %}
+	{% if purchases|length == 0 %}
 		<tr><td>No transfer data available.</td></tr>
 	{% else %}
-		{% for transfer in transfers %}
+		{% for purchase in purchases %}
 			<tr>
-				<td>{{ transfer.payer_id }}</td>
-				<td>{{ transfer.payee_id }}</td>
-				<td>${{ transfer.amount }}</td>
-				<td class='status'>{{ transfer.status }}</td>
+				<td>{{ purchase.payer_id }}</td>
+				<td>{{ purchase.merchant_id }}</td>
+				<td>${{ purchase.amount }}</td>
+				<td class='status'>{{ purchase.status }}</td>
 			</tr>
 		{% endfor %}
 	{% endif %}

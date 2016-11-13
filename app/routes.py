@@ -26,51 +26,42 @@ def after_request(response):
 def index():
 	# create the URL for the request
 	accountsUrl = 'http://api.reimaginebanking.com/accounts?key={}'.format(apiKey)
-
+        merchantUrl = 'http://api.reimaginebanking.com/merchants?key={}'.format(apiKey)
 	# make call to the Nessie Accounts endpoint
 	accountsResponse = requests.get(accountsUrl)
+	merchantResponse = requests.get(merchantUrl)
 	
 	# if the accounts call responds with success
+	merchants = json.loads(merchantResponse.text)
+	
 	if accountsResponse.status_code == 200:
 		accounts = json.loads(accountsResponse.text)
 
-		# filter out any credit card accounts (can't transfer money to/from them)
-		accountsNoCards = []
-		for account in accounts:
-			if account["type"] != "Credit Card":
-				accountsNoCards.append(account);
 
-		# variable which will keep track of all transfers to pass to UI
-		transfers = []
+		# variable which will keep track of all purchases to pass to UI
+		purchases = []
 		
-		# for each account make a request to get it's transfers where it is the payer only...
+		
 		for account in accounts:
-			transfersUrl = 'http://api.reimaginebanking.com/accounts/{}/transfers?type=payer&key={}'.format(account['_id'], apiKey)
-			transfersResponse = requests.get(transfersUrl)
+			purchaseUrl = 'http://api.reimaginebanking.com/accounts/{}/purchases?key={}'.format(account['_id'], apiKey)
+			purchaseResponse = requests.get(purchaseUrl)
+			
+			purchases.extend(json.loads(purchaseResponse.text))
 
-			# if the transfer GET request was successful, add the resulting transfers to the array of data
-			if transfersResponse.status_code == 200:
-				transfers.extend(json.loads(transfersResponse.text))
-
-		return render_template("home.html", accounts=accounts, format_price=format_price, transfers=transfers)
+		return render_template("home.html", accounts=accounts, format_price=format_price, purchases = purchases, merchants = merchants)
 	else:
 		return render_template("notfound.html")
 
-# Transfer post route.  Makes request to Nessie API to create a transfer.
+
 @app.route('/transfer', methods=['POST'])
 def postTransfer():
-	# get values from the request (populated by user into the form on the UI)
-	# (added some error handling here for invalid form input)
+	
 	fromAccount = request.form["fromAccount"]
-	if fromAccount == "":
-		return redirect("/index", code=302)
-	
+
 	toAccount = request.form["toAccount"]
-	try:
-		amount = float(request.form["amount"]) # need to convert to an int or this fails
-	except ValueError:
-		amount = ""
-	
+
+	amount = float(request.form["amount"]) # need to convert to an int or this fails
+
 	description = request.form["description"]
 	
 	# set values that are not included in the form
@@ -80,19 +71,22 @@ def postTransfer():
 
 	# set up payload for request
 	body = {
-		'medium' : medium,
-		'payee_id' : toAccount,
-		'amount' : amount,
-		'transaction_date' : dateString,
-		'description' : description
+		
+  "merchant_id": toAccount,
+  "medium": "balance",
+  "purchase_date": "2016-11-13",
+  "amount": amount,
+  "description": description
+
 	}
 
-	# make the request to create the transfer
-	url = "http://api.reimaginebanking.com/accounts/{}/transfers?key={}".format(fromAccount, apiKey)
+	# make the request to create the payment
+	url = "http://api.reimaginebanking.com/accounts/{}/purchases?key={}".format(fromAccount, apiKey)
+
 	response = requests.post(
 		url,
 		data=json.dumps(body),
-		headers={'content-type':'application/json'},)
-
-	# redirect user to the same page, which should now show there latest transaction in the list
+		headers={'content-type':'application/json'})
+	
+	# redirect user to the same page, which should now show there latest payment in the list
 	return redirect("/index", code=302)
